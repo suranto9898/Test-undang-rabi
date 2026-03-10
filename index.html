@@ -67,7 +67,11 @@ section:not(.hero-section) {
 }
 
 
-html { scroll-behavior: smooth; }
+html { 
+    scroll-behavior: smooth; 
+    scroll-padding-top: 80px; /* Sesuaikan dengan tinggi floating-nav Anda */
+}
+
 h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
 h1 { letter-spacing: 2px; text-transform: uppercase; }
 
@@ -300,7 +304,44 @@ section.show { opacity: 1; transform: translateY(0); }
     100% { transform: translateY(0px) rotate(0deg); }
 }
 
+.wishes-display { 
+    max-height: 350px; 
+    overflow-y: auto; 
+    text-align: left; 
+    padding-right: 10px; 
+}
 
+.wish-item { 
+    background: rgba(255,255,255,0.03); 
+    padding: 15px; 
+    border-radius: 12px; 
+    margin-bottom: 10px; 
+    border-left: 3px solid var(--gold); 
+}
+
+/* Memicu GPU Acceleration untuk elemen yang sering bergerak */
+.hero-section, .event-box, .arch-frame, .floating-nav, #cover-invitation {
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Mengurangi beban render pada image */
+img {
+    will-change: transform;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tambahkan ini di CSS Anda untuk menyempurnakan transisi */
+.event-box, .arch-frame, .btn-gold {
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Memastikan konten tidak berkedip saat animasi */
+body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
 
 /* =========================================
    6. GALLERY & CAROUSEL
@@ -421,16 +462,16 @@ section.show { opacity: 1; transform: translateY(0); }
 </div>
 
     <div id="cover-invitation">
-        <div data-aos="fade-up">
-            <p class="text-uppercase mb-2" style="letter-spacing: 5px; color: var(--gold)">The Wedding of</p>
-            <h1 class="display-1 mb-4">Romeo & Juliet</h1>
-            <div class="mb-5">
-                <p class="small opacity-75">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-                <h4 class="font-serif" id="guest-name">Tamu Undangan</h4>
-            </div>
-            <button class="btn-gold" onclick="startInvitation()">Buka Undangan</button>
+    <div data-aos="fade-up">
+        <p class="text-uppercase mb-2" style="letter-spacing: 5px; color: var(--gold)">The Wedding of</p>
+        <h1 class="display-1 mb-4">Romeo & Juliet</h1>
+        <div class="mb-5">
+            <h4 class="font-serif" id="guest-name">Tamu Undangan</h4>
         </div>
+        <button class="btn-gold" onclick="startInvitation()">Buka Undangan</button>
     </div>
+</div>
+
 
 <div class="modal fade" id="zoomModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -486,7 +527,7 @@ section.show { opacity: 1; transform: translateY(0); }
 
 <section id="about" class="py-5" style="background: #0e0e14;">
     <div class="container py-5 text-center">
-        <h2 class="font-serif mb-5" style="color: var(--gold)" data-aos="fade-up">Mempelai</h2>
+        <h2 class="font-serif mb-5" style="color: var(--gold)" data-aos="fade-up">Nama Mempelai</h2>
         
         <div class="row g-5 justify-content-center align-items-center">
 
@@ -700,13 +741,14 @@ section.show { opacity: 1; transform: translateY(0); }
     <div class="row g-4">
         <div class="col-md-5" data-aos="fade-right">
             <div class="event-box h-100">
-                <h3 style="color: var(--gold)" class="mb-4">RSVP</h3>
+                <h3 style="color: var(--gold)" class="mb-4">Konfirmasi & Doa</h3>
                 <input type="text" id="rsvp-nama" class="form-control custom-input mb-3" placeholder="Nama Anda">
                 <select id="rsvp-status" class="form-select custom-input mb-3">
                     <option value="Hadir">Hadir</option>
                     <option value="Tidak Hadir">Tidak Hadir</option>
                 </select>
-                <button class="btn-gold w-100" id="btn-rsvp" onclick="kirimRSVP()">Konfirmasi Kehadiran</button>
+                <textarea id="rsvp-pesan" class="form-control custom-input mb-3" placeholder="Tulis doa restu..." rows="3"></textarea>
+                <button class="btn-gold w-100" id="btn-rsvp" onclick="kirimSemua()">Kirim</button>
             </div>
         </div>
         
@@ -715,17 +757,17 @@ section.show { opacity: 1; transform: translateY(0); }
                 <h3 style="color: var(--gold)" class="mb-4">Ucapan Doa</h3>
                 <div class="wishes-display mb-4" id="wish-list">
                     <div class="wish-item">
-                        <strong>Admin</strong>
-                        <p class="small mb-0">Selamat berbahagia!</p>
+                        <strong>Tamu Undangan</strong>
+                        <p class="small mb-0">Selamat berbahagia Romeo & Juliet!</p>
                     </div>
                 </div>
-                <input type="text" id="u-nama" class="form-control custom-input mb-2" placeholder="Nama">
-                <textarea id="u-pesan" class="form-control custom-input mb-2" placeholder="Tulis doa restu..."></textarea>
-                <button class="btn btn-outline-warning w-100" id="btn-ucapan" onclick="kirimUcapanKeSheet()">Kirim Ucapan</button>
+                <p class="small opacity-50 text-center">Total ucapan akan muncul di sini.</p>
             </div>
         </div>
     </div>
 </section>
+
+
 
     
 <section id="ucapan-terakhir" class="salutation-section-style">
@@ -806,35 +848,73 @@ section.show { opacity: 1; transform: translateY(0); }
 
     // --- 5. FUNGSI DATA & INTERAKSI ---
     function setGuestName() {
-        const guest = new URLSearchParams(window.location.search).get("to");
-        if (guest) document.getElementById("guest-name").innerText = decodeURIComponent(guest);
-    }
+    // Mengambil parameter "to" dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const guestName = urlParams.get("to");
+    const element = document.getElementById("guest-name");
 
-    function copyText(text) { 
-        navigator.clipboard.writeText(text).then(() => alert("Rekening berhasil disalin!")); 
+    if (element) {
+        if (guestName) {
+            // Jika ada nama di link, tampilkan nama tersebut
+            element.innerHTML = `Kepada Yth.<br><span style="font-size: 1.5rem; color: var(--gold);">${decodeURIComponent(guestName)}</span>`;
+        } else {
+            // Jika tidak ada nama, tampilkan pesan default
+            element.innerText = "Tamu Undangan";
+        }
     }
+}
 
-    function zoomFoto(src) { 
-        const modal = new bootstrap.Modal(document.getElementById('zoomModal')); 
-        document.getElementById('zoomImage').src = src; 
-        modal.show(); 
-    }
 
     // --- 6. FUNGSI FORM (RSVP & UCAPAN) ---
-    function kirimRSVP() {
-        const nama = document.getElementById("rsvp-nama").value.trim();
-        if (!nama) { alert("Isi nama Anda."); return; }
-        fetch('URL_RSVP_ANDA', { method: 'POST', mode: 'no-cors', body: new URLSearchParams({ nama: nama, status: document.getElementById('rsvp-status').value }) })
-        .then(() => alert("Konfirmasi berhasil!"));
+    function kirimSemua() {
+    const nama = document.getElementById("rsvp-nama").value.trim();
+    const status = document.getElementById("rsvp-status").value;
+    const pesan = document.getElementById("rsvp-pesan").value.trim();
+    const btn = document.getElementById("btn-rsvp");
+
+    if (!nama || !pesan) {
+        alert("Mohon isi nama dan pesan Anda.");
+        return;
     }
 
-    function kirimUcapanKeSheet() {
-        const nama = document.getElementById("u-nama").value.trim();
-        const pesan = document.getElementById("u-pesan").value.trim();
-        if (!nama || !pesan) { alert("Isi nama dan pesan."); return; }
-        fetch('URL_UCAPAN_ANDA', { method: 'POST', mode: 'no-cors', body: new URLSearchParams({ nama: nama, pesan: pesan }) })
-        .then(() => alert("Ucapan terkirim!"));
-    }
+    // Ubah teks tombol menjadi loading
+    btn.innerText = "Mengirim...";
+    btn.disabled = true;
+
+    // 1. Tampilkan di daftar (UI update instan)
+    const list = document.getElementById("wish-list");
+    const item = document.createElement("div");
+    item.className = "wish-item";
+    item.innerHTML = `<strong>${nama} (${status})</strong><p class="small mb-0">${pesan}</p>`;
+    list.prepend(item); 
+
+    // 2. Kirim ke Google Sheets
+    fetch('URL_GOOGLE_APPS_SCRIPT_ANDA', { 
+        method: 'POST', 
+        mode: 'no-cors', 
+        body: new URLSearchParams({ 
+            'nama': nama, 
+            'status': status, 
+            'pesan': pesan 
+        }) 
+    })
+    .then(() => {
+        alert("Terima kasih " + nama + ", doa restu Anda telah kami terima.");
+        // Reset form
+        document.getElementById("rsvp-nama").value = "";
+        document.getElementById("rsvp-pesan").value = "";
+        btn.innerText = "Kirim";
+        btn.disabled = false;
+    })
+    .catch(err => {
+        alert("Gagal mengirim, silakan coba lagi.");
+        btn.innerText = "Kirim";
+        btn.disabled = false;
+        // Opsional: Hapus item dari UI jika gagal kirim
+        list.removeChild(item);
+    });
+}
+
 
         // --- 7. EVENT LISTENER UTAMA ---
     document.addEventListener("DOMContentLoaded", () => {
@@ -854,18 +934,26 @@ section.show { opacity: 1; transform: translateY(0); }
         }, 1000);
 
         // B. Scroll Logic
-        window.addEventListener("scroll", () => {
+        let isScrolling = false;
+window.addEventListener("scroll", () => {
+    if (!isScrolling) {
+        window.requestAnimationFrame(() => {
             const nav = document.getElementById("main-nav");
             const cover = document.getElementById("cover-invitation");
             if (cover && cover.classList.contains("cover-off")) {
                 const isBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 100);
-                isBottom ? nav.classList.add("show-nav") : nav.classList.remove("show-nav");
+                nav.classList.toggle("show-nav", isBottom);
             }
             document.querySelectorAll("section").forEach(sec => {
                 if (sec.getBoundingClientRect().top < window.innerHeight - 100) sec.classList.add("show");
             });
+            isScrolling = false;
         });
+        isScrolling = true;
+    }
+});
 
+        
         // C. Kunci Tombol Otomatis
         const waktuAcaraSelesai = new Date("March 10, 2027 15:00:00").getTime();
         if (new Date().getTime() > waktuAcaraSelesai) {
@@ -900,7 +988,8 @@ section.show { opacity: 1; transform: translateY(0); }
                 container.appendChild(heart);
             }
         }
-    });
+
+   });
 
 
     // --- 8. PRELOADER & EFEK ---
